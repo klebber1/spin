@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spin Tecnologia — Emissão de Nota Fiscal</title>
+  <meta name="description" content="Emita sua nota fiscal de forma rápida, segura e 100% digital com a Spin Tecnologia.">
+
+  <!-- ÍCONE DA PÁGINA (FAVICON) -->
+  <link rel="icon" type="image/png" href="img/icone-spin.png">
+
+  <!-- Compartilhamento -->
+  <meta property="og:title" content="Spin Tecnologia — Emissão de Nota Fiscal">
+  <meta property="og:description" content="Emita sua nota fiscal em minutos, sem burocracia.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="img/logo-spin.png">
+
+  <style>
+    :root{
+      --amarelo:#FFD100; --amarelo-claro:#FFFF00;
+      --azul-escuro:#243E6A; --azul:#0E94C4; --fundo:#F7FAFC;
+      --erro:#E53E3E; --sucesso:#22C55E;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--fundo);color:var(--azul-escuro);text-align:center}
+
+    header{padding:28px 16px 6px}
+    .logo{width:min(340px,72%);height:auto}
+
+    .hero{max-width:720px;margin:18px auto;padding:48px 24px;border-radius:20px;
+          background:linear-gradient(135deg,var(--azul-escuro) 0%,var(--azul) 100%);color:#fff}
+    .hero h1{font-size:clamp(1.6rem,5vw,2.5rem);line-height:1.2}
+    .hero h1 span{color:var(--amarelo)}
+    .hero p{margin:14px auto 28px;font-size:1.05rem;opacity:.92;max-width:44ch}
+
+    .cta{display:inline-block;padding:16px 40px;border-radius:50px;text-decoration:none;
+         background:linear-gradient(90deg,var(--amarelo),var(--amarelo-claro));
+         color:var(--azul-escuro);font-weight:800;font-size:1.1rem;
+         box-shadow:0 8px 20px rgba(0,0,0,.25);transition:.2s;cursor:pointer;border:none}
+    .cta:hover{transform:translateY(-2px) scale(1.03)}
+
+    .beneficios{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;max-width:720px;margin:22px auto;padding:0 16px}
+    .beneficio{background:#fff;border-radius:14px;padding:14px 18px;flex:1 1 150px;
+               box-shadow:0 4px 12px rgba(36,62,106,.12);font-weight:700}
+    .beneficio small{display:block;font-weight:400;color:var(--azul)}
+
+    footer{padding:26px 16px;font-size:.85rem;opacity:.75}
+
+    /* ========= MODAL CHECKOUT ========= */
+    .modal-bg{position:fixed;inset:0;background:rgba(14,22,38,.75);display:none;
+              align-items:center;justify-content:center;z-index:999;padding:16px}
+    .modal-bg.ativo{display:flex}
+    .modal{background:#fff;border-radius:20px;max-width:480px;width:100%;
+           padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4);
+           max-height:92vh;overflow-y:auto;position:relative}
+    .modal h2{color:var(--azul-escuro);font-size:1.4rem;margin-bottom:6px}
+    .modal .sub{color:var(--azul);font-size:.9rem;margin-bottom:22px}
+
+    .fechar{position:absolute;top:12px;right:16px;background:none;border:none;
+            font-size:1.6rem;color:var(--azul-escuro);cursor:pointer;line-height:1}
+
+    .secao-titulo{font-size:.78rem;font-weight:800;color:var(--azul);text-transform:uppercase;
+                  letter-spacing:.06em;margin:18px 0 12px;text-align:left;
+                  border-top:1px solid #E2E8F0;padding-top:14px}
+
+    .campo{margin-bottom:14px;text-align:left}
+    .campo label{display:block;font-size:.85rem;font-weight:600;margin-bottom:5px;color:var(--azul-escuro)}
+    .campo input{width:100%;padding:12px 14px;border:2px solid #E2E8F0;border-radius:10px;
+                 font-size:1rem;transition:.2s;font-family:inherit}
+    .campo input:focus{outline:none;border-color:var(--azul)}
+    .campo.erro input{border-color:var(--erro)}
+    .campo .msg-erro{color:var(--erro);font-size:.78rem;margin-top:4px;display:none}
+    .campo.erro .msg-erro{display:block}
+    .campo.uf{flex:0 0 84px}
+
+    .linha{display:flex;gap:12px}
+    .linha .campo{flex:1}
+
+    .btn-pagar{width:100%;padding:16px;border:none;border-radius:12px;
+               background:linear-gradient(90deg,var(--amarelo),var(--amarelo-claro));
+               color:var(--azul-escuro);font-weight:800;font-size:1.05rem;cursor:pointer;
+               margin-top:8px;transition:.2s}
+    .btn-pagar:hover{transform:translateY(-2px)}
+    .btn-pagar:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    .aviso{font-size:.78rem;color:#666;margin-top:14px;line-height:1.5}
+    .aviso strong{color:var(--azul-escuro)}
+
+    /* ========= TELA DE SUCESSO ========= */
+    .sucesso{display:none;text-align:center;padding:10px 0}
+    .sucesso.ativo{display:block}
+    .sucesso .icone{font-size:3rem;color:var(--sucesso);margin-bottom:10px}
+    .sucesso h3{color:var(--azul-escuro);margin-bottom:8px}
+    .sucesso p{color:#555;font-size:.92rem;line-height:1.5;margin-bottom:16px}
+    .sucesso .passos{background:var(--fundo);border-radius:12px;padding:14px;text-align:left;font-size:.88rem}
+    .sucesso .passos li{margin:6px 0 6px 18px}
+
+    @media(max-width:500px){
+      .linha{flex-direction:column;gap:0}
+      .campo.uf{flex:1}
+      .modal{padding:22px 18px}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== LOCAL DA LOGO ===== -->
+  <header>
+    <img src="img/logo-spin.png" alt="Spin Tecnologia" class="logo">
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Emissão de <span>Nota Fiscal</span><br>sem complicação</h1>
+      <p>Rápido, seguro e 100% digital. Emita sua NF em poucos cliques.</p>
+      <button class="cta" id="btnCheckout">Emitir agora</button>
+    </section>
+
+    <section class="beneficios">
+      <div class="beneficio">⚡ Rápido<small>em poucos cliques</small></div>
+      <div class="beneficio">🔒 Seguro<small>dados protegidos</small></div>
+      <div class="beneficio">🤝 Suporte<small>quando precisar</small></div>
+    </section>
+  </main>
+
+  <footer>© 2026 Spin Tecnologia Ltda</footer>
+
+  <!-- ===== MODAL DE CHECKOUT ===== -->
+  <div class="modal-bg" id="modal">
+    <div class="modal">
+      <button class="fechar" id="fecharModal">&times;</button>
+
+      <!-- Formulário -->
+      <div id="formArea">
+        <h2>Finalizar emissão</h2>
+        <p class="sub">Preencha seus dados para prosseguir ao pagamento</p>
+
+        <form id="formCheckout" novalidate>
+          <div class="campo">
+            <label for="nome">Nome completo *</label>
+            <input type="text" id="nome" required>
+            <div class="msg-erro">Informe seu nome completo</div>
+          </div>
+
+          <div class="linha">
+            <div class="campo">
+              <label for="email">E-mail *</label>
+              <input type="email" id="email" required>
+              <div class="msg-erro">E-mail inválido</div>
+            </div>
+            <div class="campo">
+              <label for="tel">Telefone *</label>
+              <input type="tel" id="tel" placeholder="(00) 00000-0000" required>
+              <div class="msg-erro">Telefone inválido</div>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="cpf">CPF / CNPJ *</label>
+            <input type="text" id="cpf" required>
+            <div class="msg-erro">Documento inválido</div>
+          </div>
+
+          <!-- ===== ENDEREÇO DO CLIENTE (NOVO) ===== -->
+          <div class="secao-titulo">Endereço</div>
+
+          <div class="linha">
+            <div class="campo">
+              <label for="cep">CEP *</label>
+              <input type="text" id="cep" placeholder="00000-000" required>
+              <div class="msg-erro">CEP inválido</div>
+            </div>
+            <div class="campo uf">
+              <label for="uf">UF *</label>
+              <input type="text" id="uf" placeholder="UF" required>
+              <div class="msg-erro">UF</div>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="logradouro">Endereço (rua/avenida) *</label>
+            <input type="text" id="logradouro" required>
+            <div class="msg-erro">Informe o endereço</div>
+          </div>
+
+          <div class="linha">
+            <div class="campo">
+              <label for="numero">Número *</label>
+              <input type="text" id="numero" required>
+              <div class="msg-erro">Obrigatório</div>
+            </div>
+            <div class="campo">
+              <label for="complemento">Complemento</label>
+              <input type="text" id="complemento" placeholder="Opcional">
+            </div>
+          </div>
+
+          <div class="linha">
+            <div class="campo">
+              <label for="bairro">Bairro *</label>
+              <input type="text" id="bairro" required>
+              <div class="msg-erro">Informe o bairro</div>
+            </div>
+            <div class="campo">
+              <label for="cidade">Cidade *</label>
+              <input type="text" id="cidade" required>
+              <div class="msg-erro">Informe a cidade</div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-pagar">Pagar com PagBank</button>
+        </form>
+
+        <p class="aviso">
+          <strong>Como funciona:</strong> Após confirmar os dados, você será direcionado ao PagBank
+          para finalizar o pagamento. Em seguida, envie o comprovante pelo WhatsApp para validarmos a emissão.
+        </p>
+      </div>
+
+      <!-- Tela de sucesso (após pagamento) -->
+      <div class="sucesso" id="sucesso">
+        <div class="icone">✅</div>
+        <h3>Redirecionado ao PagBank</h3>
+        <p>Agora siga estes passos para validar sua emissão:</p>
+        <ol class="passos">
+          <li>Finalize o pagamento no PagBank</li>
+          <li>Tire um print ou baixe o comprovante</li>
+          <li>Envie o comprovante pelo WhatsApp abaixo</li>
+        </ol>
+        <a id="linkWhats" class="btn-pagar" href="#" target="_blank" style="text-decoration:none;display:inline-block;margin-top:18px">
+          Enviar comprovante
+        </a>
+        <p class="aviso" style="margin-top:14px">Após validação, enviaremos sua NF para o e-mail informado.</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ===== CONFIGURAÇÕES =====
+  const LINK_PAGBANK = "https://pag.ae/8245uRym7";
+  // ⚠️ Troque pelo WhatsApp da Spin (com DDI 55 + DDD + número, sem símbolos)
+  const WHATSAPP_SPIN = "5500000000000";
+
+  const modal   = document.getElementById('modal');
+  const btnOpen = document.getElementById('btnCheckout');
+  const btnClose= document.getElementById('fecharModal');
+  const form    = document.getElementById('formCheckout');
+  const formArea= document.getElementById('formArea');
+  const sucesso = document.getElementById('sucesso');
+
+  btnOpen.addEventListener('click', () => modal.classList.add('ativo'));
+  btnClose.addEventListener('click', () => modal.classList.remove('ativo'));
+  modal.addEventListener('click', e => { if(e.target === modal) modal.classList.remove('ativo'); });
+
+  // ===== MÁSCARAS =====
+  document.getElementById('tel').addEventListener('input', e => {
+    let v = e.target.value.replace(/\D/g,'').slice(0,11);
+    if(v.length > 10) v = v.replace(/(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');
+    else if(v.length > 6) v = v.replace(/(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
+    else if(v.length > 2) v = v.replace(/(\d{2})(\d{0,5}).*/,'($1) $2');
+    else if(v.length > 0) v = v.replace(/(\d*)/, '($1');
+    e.target.value = v;
+  });
+
+  document.getElementById('cpf').addEventListener('input', e => {
+    let v = e.target.value.replace(/\D/g,'');
+    if(v.length <= 11){
+      v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    } else {
+      v = v.slice(0,14);
+      v = v.replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3')
+           .replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2');
+    }
+    e.target.value = v;
+  });
+
+  document.getElementById('cep').addEventListener('input', e => {
+    let v = e.target.value.replace(/\D/g,'').slice(0,8);
+    v = v.replace(/(\d{5})(\d)/,'$1-$2');
+    e.target.value = v;
+  });
+
+  document.getElementById('uf').addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);
+  });
+
+  // Preenche endereço automaticamente pelo CEP (ViaCEP — gratuito, sem chave)
+  document.getElementById('cep').addEventListener('blur', async e => {
+    const n = e.target.value.replace(/\D/g,'');
+    if(n.length !== 8) return;
+    try{
+      const r = await fetch(`https://viacep.com.br/ws/${n}/json/`);
+      const d = await r.json();
+      if(d && !d.erro){
+        if(d.logradouro) document.getElementById('logradouro').value = d.logradouro;
+        if(d.bairro)     document.getElementById('bairro').value     = d.bairro;
+        if(d.localidade) document.getElementById('cidade').value     = d.localidade;
+        if(d.uf)         document.getElementById('uf').value         = d.uf;
+      }
+    }catch(err){ /* se falhar, cliente preenche manualmente */ }
+  });
+
+  // ===== VALIDAÇÕES =====
+  function validarEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+  function validarTel(t){ return t.replace(/\D/g,'').length >= 10; }
+  function validarDoc(d){
+    const n = d.replace(/\D/g,'');
+    return n.length === 11 || n.length === 14;
+  }
+
+  function marcarErro(id, erro){
+    const campo = document.getElementById(id).closest('.campo');
+    erro ? campo.classList.add('erro') : campo.classList.remove('erro');
+  }
+
+  // ===== SUBMIT =====
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const nome       = document.getElementById('nome').value.trim();
+    const email      = document.getElementById('email').value.trim();
+    const tel        = document.getElementById('tel').value.trim();
+    const cpf        = document.getElementById('cpf').value.trim();
+    const cep        = document.getElementById('cep').value.trim();
+    const uf         = document.getElementById('uf').value.trim();
+    const logradouro = document.getElementById('logradouro').value.trim();
+    const numero     = document.getElementById('numero').value.trim();
+    const complemento= document.getElementById('complemento').value.trim();
+    const bairro     = document.getElementById('bairro').value.trim();
+    const cidade     = document.getElementById('cidade').value.trim();
+
+    let ok = true;
+    if(nome.length < 3){ marcarErro('nome', true); ok=false; } else marcarErro('nome', false);
+    if(!validarEmail(email)){ marcarErro('email', true); ok=false; } else marcarErro('email', false);
+    if(!validarTel(tel)){ marcarErro('tel', true); ok=false; } else marcarErro('tel', false);
+    if(!validarDoc(cpf)){ marcarErro('cpf', true); ok=false; } else marcarErro('cpf', false);
+    if(cep.replace(/\D/g,'').length !== 8){ marcarErro('cep', true); ok=false; } else marcarErro('cep', false);
+    if(uf.length !== 2){ marcarErro('uf', true); ok=false; } else marcarErro('uf', false);
+    if(logradouro.length < 3){ marcarErro('logradouro', true); ok=false; } else marcarErro('logradouro', false);
+    if(!numero){ marcarErro('numero', true); ok=false; } else marcarErro('numero', false);
+    if(!bairro){ marcarErro('bairro', true); ok=false; } else marcarErro('bairro', false);
+    if(!cidade){ marcarErro('cidade', true); ok=false; } else marcarErro('cidade', false);
+
+    if(!ok) return;
+
+    const endereco = `${logradouro}, ${numero}${complemento ? ' - ' + complemento : ''} — ${bairro}, ${cidade}/${uf} — CEP ${cep}`;
+
+    // Salva no localStorage para o caso de voltar da tela do PagBank
+    const dados = { nome, email, tel, cpf, cep, uf, logradouro, numero, complemento, bairro, cidade,
+                    data: new Date().toISOString() };
+    localStorage.setItem('spin_checkout', JSON.stringify(dados));
+
+    // Monta mensagem de WhatsApp pronta (comprovante)
+    const msg = encodeURIComponent(
+      `Olá, Spin Tecnologia! Acabei de realizar o pagamento da NF.\n\n`+
+      `👤 *Cliente:* ${nome}\n`+
+      `📧 *E-mail:* ${email}\n`+
+      `📱 *Telefone:* ${tel}\n`+
+      `📄 *Doc:* ${cpf}\n`+
+      `📍 *Endereço:* ${endereco}\n\n`+
+      `Segue o comprovante em anexo 👇`
+    );
+    const linkWhats = `https://wa.me/${WHATSAPP_SPIN}?text=${msg}`;
+    document.getElementById('linkWhats').href = linkWhats;
+
+    // Abre PagBank em nova aba e mostra tela de sucesso
+    window.open(LINK_PAGBANK, '_blank');
+    formArea.style.display = 'none';
+    sucesso.classList.add('ativo');
+  });
+
+  // Se usuário voltar à página com checkout salvo, mostra tela de sucesso
+  window.addEventListener('load', () => {
+    if(localStorage.getItem('spin_checkout') && window.location.hash === '#pago'){
+      const dados = JSON.parse(localStorage.getItem('spin_checkout'));
+      const endereco = `${dados.logradouro}, ${dados.numero}${dados.complemento ? ' - ' + dados.complemento : ''} — ${dados.bairro}, ${dados.cidade}/${dados.uf} — CEP ${dados.cep}`;
+      const msg = encodeURIComponent(
+        `Olá, Spin Tecnologia! Acabei de realizar o pagamento da NF.\n\n`+
+        `👤 *Cliente:* ${dados.nome}\n📧 *E-mail:* ${dados.email}\n`+
+        `📱 *Telefone:* ${dados.tel}\n📄 *Doc:* ${dados.cpf}\n`+
+        `📍 *Endereço:* ${endereco}\n\n`+
+        `Segue o comprovante em anexo 👇`
+      );
+      document.getElementById('linkWhats').href = `https://wa.me/${WHATSAPP_SPIN}?text=${msg}`;
+      formArea.style.display = 'none';
+      sucesso.classList.add('ativo');
+      modal.classList.add('ativo');
+    }
+  });
+</script>
+
+</body>
+</html>
