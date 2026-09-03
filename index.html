@@ -237,9 +237,36 @@
 
 <script>
   // ===== CONFIGURAÇÕES =====
-  const LINK_PAGBANK = "https://pag.ae/8245uRym7";
+  // 👉 URL pública do SEU servidor no Render (o backend que fala com a API
+  //    do PagBank). Ex: "https://spin-checkout.onrender.com"
+  //    É esse servidor que cria o checkout de cartão de crédito e recebe
+  //    a confirmação real de pagamento do PagBank.
+  const URL_BACKEND = "";
+
   // ⚠️ Troque pelo WhatsApp da Spin (com DDI 55 + DDD + número, sem símbolos)
   const WHATSAPP_SPIN = "5500000000000";
+
+  // ===== WEBHOOKS (Make, Zapier, n8n, endpoint próprio, etc.) =====
+  // 👉 COLOQUE AQUI o link do webhook disparado quando o cliente envia o formulário
+  //    e é redirecionado ao PagBank (evento: "checkout_iniciado").
+  //    Deixe em branco ("") para não disparar este evento.
+  const WEBHOOK_CHECKOUT_INICIADO = "";
+
+  // 👉 COLOQUE AQUI o link do webhook disparado quando o cliente clica em
+  //    "Enviar comprovante" (evento: "comprovante_enviado").
+  //    Deixe em branco ("") para não disparar este evento.
+  const WEBHOOK_COMPROVANTE_ENVIADO = "";
+
+  // Envia os dados para um webhook via POST (JSON). Não bloqueia a navegação:
+  // se o link estiver vazio ou a requisição falhar, o restante do fluxo continua normalmente.
+  function enviarWebhook(url, payload){
+    if(!url) return;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(err => console.error('Falha ao enviar webhook:', err));
+  }
 
   const modal   = document.getElementById('modal');
   const btnOpen = document.getElementById('btnCheckout');
@@ -251,6 +278,14 @@
   btnOpen.addEventListener('click', () => modal.classList.add('ativo'));
   btnClose.addEventListener('click', () => modal.classList.remove('ativo'));
   modal.addEventListener('click', e => { if(e.target === modal) modal.classList.remove('ativo'); });
+
+  // 🔔 WEBHOOK: cliente clicou em "Enviar comprovante" (vai abrir o WhatsApp)
+  document.getElementById('linkWhats').addEventListener('click', () => {
+    const dadosSalvos = localStorage.getItem('spin_checkout');
+    if(dadosSalvos){
+      enviarWebhook(WEBHOOK_COMPROVANTE_ENVIADO, { evento: 'comprovante_enviado', ...JSON.parse(dadosSalvos) });
+    }
+  });
 
   // ===== MÁSCARAS =====
   document.getElementById('tel').addEventListener('input', e => {
@@ -314,7 +349,7 @@
   }
 
   // ===== SUBMIT =====
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const nome       = document.getElementById('nome').value.trim();
     const email      = document.getElementById('email').value.trim();
@@ -349,6 +384,9 @@
                     data: new Date().toISOString() };
     localStorage.setItem('spin_checkout', JSON.stringify(dados));
 
+    // 🔔 WEBHOOK: cliente preencheu o formulário e vai ao PagBank
+    enviarWebhook(WEBHOOK_CHECKOUT_INICIADO, { evento: 'checkout_iniciado', ...dados });
+
     // Monta mensagem de WhatsApp pronta (comprovante)
     const msg = encodeURIComponent(
       `Olá, Spin Tecnologia! Acabei de realizar o pagamento da NF.\n\n`+
@@ -362,10 +400,41 @@
     const linkWhats = `https://wa.me/${WHATSAPP_SPIN}?text=${msg}`;
     document.getElementById('linkWhats').href = linkWhats;
 
-    // Abre PagBank em nova aba e mostra tela de sucesso
-    window.open(LINK_PAGBANK, '_blank');
-    formArea.style.display = 'none';
-    sucesso.classList.add('ativo');
+    // ===== CRIA O CHECKOUT DE CARTÃO NO BACKEND (API do PagBank) =====
+    // Em vez de abrir um link fixo, pedimos ao NOSSO servidor para criar um
+    // checkout novo pra esse pedido. O servidor fala com o PagBank usando o
+    // token secreto (que nunca fica no navegador) e devolve o link de
+    // pagamento gerado na hora.
+    const botaoSubmit = form.querySelector('button[type="submit"]');
+    const textoOriginalBotao = botaoSubmit ? botaoSubmit.textContent : null;
+    if(botaoSubmit){ botaoSubmit.disabled = true; botaoSubmit.textContent = 'Gerando pagamento...'; }
+
+    try {
+      const resposta = await fetch(`${URL_BACKEND}/criar-checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, cpf, tel })
+      });
+      const resultado = await resposta.json();
+
+      if(!resposta.ok || !resultado.linkPagamento){
+        throw new Error(resultado.erro || 'Não foi possível gerar o link de pagamento.');
+      }
+
+      // Guarda o id do checkout, útil caso queira consultar o status depois
+      localStorage.setItem('spin_checkout_id', resultado.checkoutId || '');
+
+      // Abre a página de pagamento do PagBank (cartão de crédito) em nova aba
+      window.open(resultado.linkPagamento, '_blank');
+      formArea.style.display = 'none';
+      sucesso.classList.add('ativo');
+
+    } catch(erro) {
+      console.error('Erro ao gerar checkout:', erro);
+      alert('Não foi possível gerar o pagamento agora. Tente novamente em instantes.');
+    } finally {
+      if(botaoSubmit){ botaoSubmit.disabled = false; botaoSubmit.textContent = textoOriginalBotao; }
+    }
   });
 
   // Se usuário voltar à página com checkout salvo, mostra tela de sucesso
