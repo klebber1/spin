@@ -15,115 +15,393 @@
   <meta property="og:type" content="website">
   <meta property="og:image" content="img/logo-spin.png">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --amarelo:#FFD100; --amarelo-claro:#FFFF00;
-      --azul-escuro:#243E6A; --azul:#0E94C4; --fundo:#F7FAFC;
-      --erro:#E53E3E; --sucesso:#22C55E;
+      --tinta-900:#0E2C4F;
+      --tinta-700:#163F6D;
+      --azul:#1487B8;
+      --dourado:#D6A400;
+      --dourado-claro:#F0C534;
+      --papel:#F7F8FA;
+      --branco:#FFFFFF;
+      --linha:#E3E7EC;
+      --texto:#1A2733;
+      --texto-suave:#57616E;
+      --erro:#B3402A;
+      --sucesso:#1D7A4C;
+
+      --raio:14px;
+      --raio-sm:9px;
+      --sombra: 0 18px 40px -18px rgba(14,44,79,.35);
     }
+
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--fundo);color:var(--azul-escuro);text-align:center}
 
-    header{padding:28px 16px 6px}
-    .logo{width:min(340px,72%);height:auto}
+    html{scroll-behavior:smooth}
 
-    .hero{max-width:720px;margin:18px auto;padding:48px 24px;border-radius:20px;
-          background:linear-gradient(135deg,var(--azul-escuro) 0%,var(--azul) 100%);color:#fff}
-    .hero h1{font-size:clamp(1.6rem,5vw,2.5rem);line-height:1.2}
-    .hero h1 span{color:var(--amarelo)}
-    .hero p{margin:14px auto 28px;font-size:1.05rem;opacity:.92;max-width:44ch}
+    body{
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      background:var(--papel);
+      color:var(--texto);
+      -webkit-font-smoothing:antialiased;
+    }
 
-    .cta{display:inline-block;padding:16px 40px;border-radius:50px;text-decoration:none;
-         background:linear-gradient(90deg,var(--amarelo),var(--amarelo-claro));
-         color:var(--azul-escuro);font-weight:800;font-size:1.1rem;
-         box-shadow:0 8px 20px rgba(0,0,0,.25);transition:.2s;cursor:pointer;border:none}
-    .cta:hover{transform:translateY(-2px) scale(1.03)}
+    a{color:inherit}
 
-    .beneficios{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;max-width:720px;margin:22px auto;padding:0 16px}
-    .beneficio{background:#fff;border-radius:14px;padding:14px 18px;flex:1 1 150px;
-               box-shadow:0 4px 12px rgba(36,62,106,.12);font-weight:700}
-    .beneficio small{display:block;font-weight:400;color:var(--azul)}
+    img{display:block;max-width:100%}
 
-    footer{padding:26px 16px;font-size:.85rem;opacity:.75}
+    .envelope{max-width:1180px;margin:0 auto;padding-inline:24px}
+
+    /* ========= TOPO ========= */
+    .topo{
+      border-bottom:1px solid var(--linha);
+      background:var(--branco);
+    }
+    .topo-conteudo{
+      display:flex;flex-direction:column;align-items:center;gap:10px;
+      padding-block:18px;
+    }
+    .topo .logo{width:min(180px,44vw);height:auto}
+
+    .topo-produto{
+      display:flex;align-items:center;gap:10px;
+      font-size:.82rem;font-weight:600;color:var(--tinta-700);
+      white-space:nowrap;
+    }
+    .topo-produto em{color:var(--texto-suave);font-style:normal;font-weight:500}
+    .topo-produto-linha{display:none}
+
+    @media(min-width:760px){
+      .topo-conteudo{flex-direction:row;justify-content:space-between}
+      .topo .logo{width:200px}
+      .topo-produto-linha{
+        display:block;width:1px;height:22px;background:var(--linha);
+      }
+      .topo-produto{gap:14px}
+    }
+
+    /* ========= HERO ========= */
+    .hero{padding-block:52px 44px}
+
+    .hero .envelope{
+      display:grid;
+      gap:40px;
+      align-items:center;
+    }
+
+    .hero-copy{text-align:center}
+    .hero-copy h1{
+      font-size:clamp(1.9rem,5.4vw,2.9rem);
+      font-weight:800;
+      line-height:1.18;
+      letter-spacing:-.01em;
+      color:var(--tinta-900);
+      max-width:16ch;
+      margin-inline:auto;
+    }
+    .hero-copy p{
+      margin:18px auto 0;
+      max-width:42ch;
+      font-size:1.06rem;
+      line-height:1.6;
+      color:var(--texto-suave);
+    }
+
+    .cta{
+      display:inline-flex;align-items:center;justify-content:center;
+      margin-top:28px;
+      padding:15px 34px;
+      border:none;border-radius:999px;cursor:pointer;
+      background:linear-gradient(135deg,var(--dourado-claro),var(--dourado));
+      color:var(--tinta-900);
+      font-family:inherit;font-weight:700;font-size:1.02rem;
+      box-shadow:0 14px 30px -12px rgba(214,164,0,.55);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .cta:hover{transform:translateY(-2px);box-shadow:0 18px 34px -12px rgba(214,164,0,.6)}
+    .cta:active{transform:translateY(0)}
+    .cta:focus-visible{outline:3px solid var(--azul);outline-offset:3px}
+
+    /* Marcadores de confiança */
+    .confianca{
+      display:flex;flex-wrap:wrap;justify-content:center;
+      gap:10px 28px;
+      margin-top:34px;
+      padding-top:26px;
+      border-top:1px solid var(--linha);
+    }
+    .confianca-item{
+      display:flex;align-items:center;gap:9px;
+      font-size:.92rem;font-weight:600;color:var(--tinta-700);
+      white-space:nowrap;
+    }
+    .confianca-item svg{flex:none;width:19px;height:19px;color:var(--azul)}
+
+    /* Painel visual do hero */
+    .hero-arte{
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(150deg,var(--tinta-900) 0%,var(--tinta-700) 65%,var(--azul) 130%);
+      border-radius:22px;
+      padding:52px 28px;
+      box-shadow:var(--sombra);
+    }
+    .hero-arte img{width:min(220px,52vw);height:auto;filter:drop-shadow(0 16px 26px rgba(0,0,0,.28))}
+
+    @media(min-width:900px){
+      .hero .envelope{grid-template-columns:1.05fr .95fr;text-align:left}
+      .hero-copy{text-align:left}
+      .hero-copy h1{margin-inline:0}
+      .hero-copy p{margin-inline:0}
+      .confianca{justify-content:flex-start}
+      .hero-arte{padding:64px 40px}
+      .hero-arte img{width:min(280px,80%)}
+    }
+
+    /* ========= RODAPÉ ========= */
+    footer{
+      margin-top:20px;
+      background:var(--tinta-900);
+      color:#C9D5E2;
+      padding-block:40px 26px;
+    }
+    .rodape-grade{
+      display:grid;gap:28px;
+      text-align:center;
+    }
+    .rodape-col{display:flex;flex-direction:column;align-items:center;gap:8px}
+    .rodape-col-redes{align-items:center}
+
+    footer .marca{display:flex;align-items:center;gap:10px}
+    footer .marca img{width:26px;height:26px}
+    footer .marca span{font-weight:700;color:#fff;letter-spacing:.01em}
+
+    .rodape-lema{font-size:.85rem;color:#93A4B8;font-style:italic}
+    .rodape-link-site{
+      font-size:.85rem;font-weight:600;color:var(--dourado-claro);
+      text-decoration:none;
+    }
+    .rodape-link-site:hover{text-decoration:underline}
+
+    .rodape-titulo{
+      font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+      color:#7C90A6;margin-bottom:2px;
+    }
+    .rodape-col a{
+      font-size:.87rem;color:#D7E0EA;text-decoration:none;
+    }
+    .rodape-col a:hover{color:var(--dourado-claro)}
+    .rodape-endereco{font-size:.87rem;color:#93A4B8;max-width:26ch}
+
+    .redes{display:flex;gap:12px;margin-top:2px}
+    .redes a{
+      width:36px;height:36px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid #2B4A6B;color:#C9D5E2;
+      transition:border-color .15s ease, color .15s ease;
+    }
+    .redes a:hover{border-color:var(--dourado-claro);color:var(--dourado-claro)}
+    .redes svg{width:17px;height:17px}
+
+    .rodape-copy{
+      font-size:.8rem;color:#7C90A6;
+      text-align:center;
+      grid-column:1/-1;
+      padding-top:22px;border-top:1px solid #1F3A57;
+    }
+
+    @media(min-width:760px){
+      .rodape-grade{grid-template-columns:1.2fr 1fr 1fr;text-align:left}
+      .rodape-col{align-items:flex-start}
+      .rodape-col-redes{align-items:flex-start}
+    }
 
     /* ========= MODAL CHECKOUT ========= */
-    .modal-bg{position:fixed;inset:0;background:rgba(14,22,38,.75);display:none;
-              align-items:center;justify-content:center;z-index:999;padding:16px}
+    .modal-bg{
+      position:fixed;inset:0;background:rgba(10,20,34,.72);
+      display:none;align-items:center;justify-content:center;
+      z-index:999;padding:16px;backdrop-filter:blur(2px);
+    }
     .modal-bg.ativo{display:flex}
-    .modal{background:#fff;border-radius:20px;max-width:480px;width:100%;
-           padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4);
-           max-height:92vh;overflow-y:auto;position:relative}
-    .modal h2{color:var(--azul-escuro);font-size:1.4rem;margin-bottom:6px}
-    .modal .sub{color:var(--azul);font-size:.9rem;margin-bottom:22px}
+    .modal{
+      background:var(--branco);border-radius:18px;max-width:500px;width:100%;
+      padding:30px 26px;box-shadow:0 30px 70px rgba(6,16,30,.45);
+      max-height:92vh;overflow-y:auto;position:relative;
+      text-align:left;
+    }
+    .modal h2{color:var(--tinta-900);font-size:1.35rem;font-weight:800;margin-bottom:6px}
+    .modal .sub{color:var(--texto-suave);font-size:.92rem;margin-bottom:24px;line-height:1.5}
 
-    .fechar{position:absolute;top:12px;right:16px;background:none;border:none;
-            font-size:1.6rem;color:var(--azul-escuro);cursor:pointer;line-height:1}
+    .fechar{
+      position:absolute;top:14px;right:16px;
+      width:32px;height:32px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      background:var(--papel);border:1px solid var(--linha);
+      font-size:1.3rem;color:var(--tinta-700);cursor:pointer;line-height:1;
+      transition:background .15s ease;
+    }
+    .fechar:hover{background:var(--linha)}
 
-    .secao-titulo{font-size:.78rem;font-weight:800;color:var(--azul);text-transform:uppercase;
-                  letter-spacing:.06em;margin:18px 0 12px;text-align:left;
-                  border-top:1px solid #E2E8F0;padding-top:14px}
+    .secao-titulo{
+      font-size:.76rem;font-weight:700;color:var(--tinta-700);
+      text-transform:uppercase;letter-spacing:.04em;
+      margin:20px 0 12px;text-align:left;
+      border-top:1px solid var(--linha);padding-top:16px;
+    }
 
     .campo{margin-bottom:14px;text-align:left}
-    .campo label{display:block;font-size:.85rem;font-weight:600;margin-bottom:5px;color:var(--azul-escuro)}
-    .campo input{width:100%;padding:12px 14px;border:2px solid #E2E8F0;border-radius:10px;
-                 font-size:1rem;transition:.2s;font-family:inherit}
-    .campo input:focus{outline:none;border-color:var(--azul)}
+    .campo label{display:block;font-size:.84rem;font-weight:600;margin-bottom:6px;color:var(--tinta-900)}
+    .campo input{
+      width:100%;padding:12px 14px;
+      border:1.5px solid var(--linha);border-radius:var(--raio-sm);
+      font-size:.98rem;font-family:inherit;color:var(--texto);
+      background:var(--branco);
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    .campo input::placeholder{color:#A6AFB9}
+    .campo input:focus{
+      outline:none;border-color:var(--azul);
+      box-shadow:0 0 0 3px rgba(20,135,184,.15);
+    }
     .campo.erro input{border-color:var(--erro)}
-    .campo .msg-erro{color:var(--erro);font-size:.78rem;margin-top:4px;display:none}
+    .campo.erro input:focus{box-shadow:0 0 0 3px rgba(179,64,42,.15)}
+    .campo .msg-erro{color:var(--erro);font-size:.78rem;margin-top:5px;display:none}
     .campo.erro .msg-erro{display:block}
-    .campo.uf{flex:0 0 84px}
+    .campo.uf{flex:0 0 90px}
 
     .linha{display:flex;gap:12px}
     .linha .campo{flex:1}
 
-    .btn-pagar{width:100%;padding:16px;border:none;border-radius:12px;
-               background:linear-gradient(90deg,var(--amarelo),var(--amarelo-claro));
-               color:var(--azul-escuro);font-weight:800;font-size:1.05rem;cursor:pointer;
-               margin-top:8px;transition:.2s}
-    .btn-pagar:hover{transform:translateY(-2px)}
+    .btn-pagar{
+      width:100%;padding:15px;border:none;border-radius:var(--raio-sm);
+      background:linear-gradient(135deg,var(--dourado-claro),var(--dourado));
+      color:var(--tinta-900);font-family:inherit;font-weight:700;font-size:1rem;
+      cursor:pointer;margin-top:10px;transition:transform .15s ease, opacity .15s ease;
+    }
+    .btn-pagar:hover{transform:translateY(-1px)}
     .btn-pagar:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .btn-pagar:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
 
-    .aviso{font-size:.78rem;color:#666;margin-top:14px;line-height:1.5}
-    .aviso strong{color:var(--azul-escuro)}
+    .aviso{font-size:.8rem;color:var(--texto-suave);margin-top:16px;line-height:1.55}
+    .aviso strong{color:var(--tinta-900)}
 
     /* ========= TELA DE SUCESSO ========= */
-    .sucesso{display:none;text-align:center;padding:10px 0}
+    .sucesso{display:none;text-align:center;padding:6px 0}
     .sucesso.ativo{display:block}
-    .sucesso .icone{font-size:3rem;color:var(--sucesso);margin-bottom:10px}
-    .sucesso h3{color:var(--azul-escuro);margin-bottom:8px}
-    .sucesso p{color:#555;font-size:.92rem;line-height:1.5;margin-bottom:16px}
-    .sucesso .passos{background:var(--fundo);border-radius:12px;padding:14px;text-align:left;font-size:.88rem}
-    .sucesso .passos li{margin:6px 0 6px 18px}
+    .sucesso .icone{
+      width:54px;height:54px;margin:0 auto 14px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:50%;background:rgba(29,122,76,.1);color:var(--sucesso);
+    }
+    .sucesso .icone svg{width:28px;height:28px}
+    .sucesso h3{color:var(--tinta-900);font-size:1.2rem;font-weight:800;margin-bottom:8px}
+    .sucesso p{color:var(--texto-suave);font-size:.94rem;line-height:1.55;margin-bottom:16px}
+    .sucesso .passos{
+      background:var(--papel);border:1px solid var(--linha);
+      border-radius:var(--raio-sm);padding:16px 18px;text-align:left;font-size:.9rem;
+      color:var(--texto);
+    }
+    .sucesso .passos li{margin:7px 0 7px 18px;line-height:1.5}
 
-    @media(max-width:500px){
+    @media(max-width:560px){
       .linha{flex-direction:column;gap:0}
       .campo.uf{flex:1}
-      .modal{padding:22px 18px}
+      .modal{padding:24px 20px}
     }
   </style>
 </head>
 <body>
 
-  <!-- ===== LOCAL DA LOGO ===== -->
-  <header>
-    <img src="img/logo-spin.png" alt="Spin Tecnologia" class="logo">
-  </header>
+  <!-- ===== TOPO / LOGO ===== -->
+  <div class="topo">
+    <div class="envelope topo-conteudo">
+      <img src="img/logo-spin.png" alt="Spin Tecnologia" class="logo">
+      <div class="topo-produto">
+        <span class="topo-produto-linha"></span>
+        Spin NF-e <em>· Emissor de Nota Fiscal</em>
+      </div>
+    </div>
+  </div>
 
   <main>
     <section class="hero">
-      <h1>Emissão de <span>Nota Fiscal</span><br>sem complicação</h1>
-      <p>Rápido, seguro e 100% digital. Emita sua NF em poucos cliques.</p>
-      <button class="cta" id="btnCheckout">Emitir agora</button>
-    </section>
+      <div class="envelope">
 
-    <section class="beneficios">
-      <div class="beneficio">⚡ Rápido<small>em poucos cliques</small></div>
-      <div class="beneficio">🔒 Seguro<small>dados protegidos</small></div>
-      <div class="beneficio">🤝 Suporte<small>quando precisar</small></div>
+        <div class="hero-copy">
+          <h1>Emissão de nota fiscal sem complicação</h1>
+          <p>Rápido, seguro e 100% digital. Emita sua nota fiscal em poucos cliques, sem burocracia.</p>
+
+          <button class="cta" id="btnCheckout">Emitir agora</button>
+
+          <div class="confianca">
+            <div class="confianca-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
+              Rápido, em poucos cliques
+            </div>
+            <div class="confianca-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/></svg>
+              Dados protegidos
+            </div>
+            <div class="confianca-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-2a4 4 0 0 1 4-4h1"/><circle cx="9" cy="7" r="3"/><path d="M15 21v-2a4 4 0 0 0-3-3.87"/><path d="M15.5 3.5a3 3 0 0 1 0 6"/><path d="M20 21v-2a4 4 0 0 0-3-3.87"/></svg>
+              Suporte quando precisar
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-arte">
+          <img src="img/icone-spin-transparente.png" alt="Marca Spin Tecnologia">
+        </div>
+
+      </div>
     </section>
   </main>
 
-  <footer>© 2026 Spin Tecnologia Ltda</footer>
+  <footer>
+    <div class="envelope rodape-grade">
+
+      <div class="rodape-col">
+        <div class="marca">
+          <img src="img/icone-spin-transparente.png" alt="">
+          <span>Spin Tecnologia</span>
+        </div>
+        <p class="rodape-lema">"Tecnologia a Serviço do Humano."</p>
+        <a class="rodape-link-site" href="https://spintecnologia.spintecnologia.com.br/" target="_blank" rel="noopener">
+          Conheça a Spin Tecnologia ↗
+        </a>
+      </div>
+
+      <div class="rodape-col">
+        <span class="rodape-titulo">Contato</span>
+        <a href="tel:+5519996081878">+55 19 99608-1878</a>
+        <a href="mailto:spin@spintecnologia.com.br">spin@spintecnologia.com.br</a>
+        <span class="rodape-endereco">Av. Falcão, 392 — Engenheiro Coelho, SP</span>
+      </div>
+
+      <div class="rodape-col rodape-col-redes">
+        <span class="rodape-titulo">Redes sociais</span>
+        <div class="redes">
+          <a href="https://www.facebook.com/spintecnologia" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 8.5h2V5h-2c-2.2 0-4 1.8-4 4v2H9v3.5h2V19h3.5v-4.5H17l.5-3.5h-3V9c0-.5.5-1 .5-1Z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/spin.tecnologia" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.6" cy="7.4" r="1"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/spin-tecnologia-a62113199/" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="16" rx="3"/><line x1="8" y1="10.5" x2="8" y2="16"/><circle cx="8" cy="7.3" r=".9" fill="currentColor" stroke="none"/><path d="M12 16v-3.2c0-1.5 1-2.3 2.2-2.3 1.2 0 1.8.9 1.8 2.3V16"/></svg>
+          </a>
+          <a href="https://twitter.com/SpinTecnologia" target="_blank" rel="noopener" aria-label="Twitter/X">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 5l14 14M19 5 5 19"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <small class="rodape-copy">© 2026 Spin Tecnologia Ltda</small>
+    </div>
+  </footer>
 
   <!-- ===== MODAL DE CHECKOUT ===== -->
   <div class="modal-bg" id="modal">
@@ -161,7 +439,7 @@
             <div class="msg-erro">Documento inválido</div>
           </div>
 
-          <!-- ===== ENDEREÇO DO CLIENTE (NOVO) ===== -->
+          <!-- ===== ENDEREÇO DO CLIENTE ===== -->
           <div class="secao-titulo">Endereço</div>
 
           <div class="linha">
@@ -219,7 +497,9 @@
 
       <!-- Tela de sucesso (após pagamento) -->
       <div class="sucesso" id="sucesso">
-        <div class="icone">✅</div>
+        <div class="icone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
         <h3>Redirecionado ao PagBank</h3>
         <p>Agora siga estes passos para validar sua emissão:</p>
         <ol class="passos">
