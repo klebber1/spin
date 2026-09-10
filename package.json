@@ -1,7 +1,7 @@
 {
   "name": "spin-checkout-pagbank",
   "version": "1.0.0",
-  "description": "Backend que integra a landing page da Spin com a API de Checkout do PagBank (cartão de crédito) e recebe os webhooks de confirmação de pagamento.",
+  "description": "Backend que integra a landing page da Spin com a API de Checkout do PagBank (cartão de crédito, com cobrança recorrente mensal) e recebe os webhooks de confirmação de pagamento.",
   "main": "server.js",
   "engines": {
     "node": ">=18.0.0"
@@ -10,7 +10,8 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2"
   }
 }
