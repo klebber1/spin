@@ -7,7 +7,7 @@
   <meta name="description" content="Emita sua nota fiscal de forma rápida, segura e 100% digital com a Spin Tecnologia.">
 
   <!-- ÍCONE DA PÁGINA (FAVICON) -->
-  <link rel="icon" type="image/png" href="img/icone-spin.png">
+  <link rel="icon" type="image/jpeg" href="img/icone-spin.jpg">
 
   <!-- Compartilhamento -->
   <meta property="og:title" content="Spin Tecnologia — Emissão de Nota Fiscal">
@@ -237,11 +237,14 @@
 
 <script>
   // ===== CONFIGURAÇÕES =====
-  // 👉 URL pública do SEU servidor no Render (o backend que fala com a API
-  //    do PagBank). Ex: "https://spin-checkout.onrender.com"
-  //    É esse servidor que cria o checkout de cartão de crédito e recebe
-  //    a confirmação real de pagamento do PagBank.
-  const URL_BACKEND = "";
+  // 👉 URL pública do SEU servidor (o backend que fala com a API do PagBank).
+  //    Durante testes locais com ngrok, use a URL do ngrok (a mesma que está
+  //    em MEU_DOMINIO no seu .env). Quando publicar no Render, troque para a
+  //    URL do Render (ex: "https://spin-checkout.onrender.com").
+  //    ⚠️ Esse valor precisa ser IDÊNTICO ao MEU_DOMINIO do servidor — se
+  //    forem diferentes (ou se o ngrok gerar uma URL nova), o pagamento
+  //    falha exatamente como estava acontecendo.
+  const URL_BACKEND = "https://alongside-exploring-mural.ngrok-free.dev";
 
   // ⚠️ Troque pelo WhatsApp da Spin (com DDI 55 + DDD + número, sem símbolos)
   const WHATSAPP_SPIN = "5500000000000";
