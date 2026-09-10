@@ -95,7 +95,7 @@ npm install
 ### 2. Configurar o `.env`
 
 ```bash
-cp .env.example .env
+cp .env
 ```
 
 Preencha o `PAGBANK_TOKEN` (de uma conta sandbox de desenvolvedor PagBank) e os demais campos.
