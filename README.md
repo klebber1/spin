@@ -11,7 +11,6 @@ Landing page de emissão de Nota Fiscal com checkout de **cartão de crédito** 
 ├── index.html          # Landing page (formulário + fluxo de checkout)
 ├── server.js            # Backend Node.js / Express (API PagBank + webhooks)
 ├── package.json          # Dependências do Node.js
-├── .env.example          # Modelo das variáveis de ambiente
 ├── .env                  # Suas variáveis reais (NUNCA versionar — veja .gitignore)
 └── img/
     ├── logo-spin.png     # Logotipo exibido na landing page
@@ -64,7 +63,7 @@ POST /webhook/pagbank-assinaturas de novo (evento subscription.recurrence)
 
 ## ⚙️ Variáveis de ambiente
 
-Copie `.env.example` para `.env` e preencha:
+Entre em `.env` e preencha:
 
 | Variável | Descrição |
 |---|---|
