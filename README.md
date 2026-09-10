@@ -179,25 +179,147 @@ Para não precisar esperar 30 dias:
 
 ---
 
-## ☁️ Deploy no Render
+## ☁️ Colocando em produção — passo a passo
 
-1. Suba o projeto (sem a pasta `node_modules` e sem o `.env`) para um repositório GitHub/GitLab
-2. No [Render](https://render.com): **New +** → **Web Service** → conecte o repositório
-3. **Build Command:** `npm install`
-4. **Start Command:** `npm start`
-5. Em **Environment**, cadastre todas as variáveis listadas na seção acima (usando a URL pública que o Render vai gerar em `MEU_DOMINIO`)
-6. Atualize o `URL_BACKEND` no `index.html` para a URL do Render
+Este passo a passo assume que os testes em sandbox (seções anteriores) já
+funcionaram de ponta a ponta: pagamento aprovado, webhook de pagamento e
+webhook de assinatura recebidos, e a cobrança recorrente do mês seguinte
+confirmada.
+
+### Passo 1 — Solicitar homologação para Pagamentos Recorrentes
+
+O uso de cobrança recorrente em **produção** normalmente exige aprovação
+prévia do time do PagBank (diferente do sandbox, que já funciona sem essa
+aprovação).
+
+1. Acesse sua conta real do PagBank (não a de sandbox)
+2. Entre em contato com o time de Integrações/Suporte do PagBank e solicite a
+   habilitação do produto **Pagamentos Recorrentes** para a sua conta
+3. Aguarde a confirmação por e-mail antes de prosseguir — sem essa liberação,
+   os checkouts com `recurrence_plan` podem falhar em produção mesmo com
+   token e configuração corretos
+
+### Passo 2 — Gerar o token de produção
+
+1. Acesse **Minha Conta → Integrações → Tokens de API** na sua conta real do
+   PagBank (não confundir com a conta de sandbox usada nos testes)
+2. Gere um novo token, com o ambiente marcado como **produção**
+3. Guarde esse token em local seguro — ele **não** deve ser commitado no
+   Git nem compartilhado
+
+### Passo 3 — Preparar o repositório
+
+1. Confirme que o `.gitignore` está presente e contém `node_modules/` e `.env`
+2. Confirme que **nenhum token real** está commitado em nenhum arquivo do
+   repositório (revise o histórico de commits também, se algum token chegou
+   a ser commitado por engano em algum momento)
+3. Suba o projeto para o GitHub (ou GitLab):
+   ```bash
+   git add .
+   git commit -m "Preparando para produção"
+   git push
+   ```
+
+### Passo 4 — Criar o serviço no Render
+
+1. Acesse [render.com](https://render.com) e faça login
+2. **New +** → **Web Service**
+3. Conecte o repositório do GitHub/GitLab
+4. Configure:
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+   - **Region:** de preferência a mais próxima do seu público
+5. Ainda não finalize — primeiro configure as variáveis de ambiente (Passo 5)
+
+### Passo 5 — Configurar as variáveis de ambiente de produção
+
+Em **Environment**, cadastre (valores de produção, não os de teste):
+
+| Variável | Valor em produção |
+|---|---|
+| `PAGBANK_TOKEN` | O token de produção gerado no Passo 2 |
+| `PAGBANK_AMBIENTE` | `production` |
+| `MEU_DOMINIO` | A URL pública que o Render atribuir ao serviço (ex: `https://spin-checkout.onrender.com`) — só é possível saber essa URL depois do primeiro deploy; pode editar essa variável e reiniciar o serviço depois |
+| `URL_RETORNO_CLIENTE` | URL real da sua landing page em produção (ex: `https://spin-checkout.onrender.com/index.html#pago`, ou seu domínio próprio) |
+| `VALOR_PRODUTO_REAIS` | Preço real cobrado |
+| `RECORRENCIA_ATIVA` | `true` |
+| `WEBHOOK_PAGAMENTO_CONFIRMADO` / `WEBHOOK_COBRANCA_RECORRENTE` | Webhooks reais de automação, se for usar |
+
+Depois de salvar, clique em **Create Web Service** (ou **Manual Deploy**, se
+o serviço já existir) para publicar.
+
+### Passo 6 — Atualizar a URL do backend na landing page
+
+1. Copie a URL pública que o Render gerou para o serviço
+2. No `index.html`, atualize `URL_BACKEND` para essa URL
+3. Se `MEU_DOMINIO` foi cadastrado com um valor provisório no Passo 5,
+   atualize-o agora para a URL real e reinicie o serviço no Render (isso é
+   necessário porque essa variável é usada para registrar as URLs de webhook
+   junto ao PagBank)
+4. Faça commit e push dessa alteração — o Render publica automaticamente a
+   nova versão a cada push, se o deploy automático estiver ativado
+
+### Passo 7 — Confirmar o registro dos webhooks
+
+1. Abra os **logs** do serviço no painel do Render
+2. Procure pela linha: `✅ URL de notificação de assinaturas configurada com
+   sucesso na conta PagBank.`
+3. Se aparecer erro nesse ponto, geralmente é sinal de que a homologação do
+   Passo 1 ainda não foi concluída — confirme com o suporte do PagBank
+
+### Passo 8 — Revisar a validação de assinatura dos webhooks
+
+Durante os testes em sandbox, a validação do header `x-authenticity-token`
+foi deixada permissiva (apenas registra um aviso, não bloqueia), porque esse
+header nem sempre chega em sandbox. Em produção:
+
+1. Faça um pagamento de teste real (de baixo valor) e confira, nos logs do
+   Render, se o header `x-authenticity-token` chegou corretamente em
+   `/webhook/pagbank`
+2. Se estiver chegando de forma consistente e você quiser reforçar a
+   segurança contra notificações falsas, volte a bloquear a requisição
+   (`return res.status(401)...`) quando a assinatura não bater, no lugar do
+   `console.warn` atual
+
+### Passo 9 — Testar um ciclo completo em produção
+
+1. Faça uma compra real de teste com um cartão válido (idealmente de baixo
+   valor, ou reembolsável)
+2. Confirme que:
+   - o pagamento é aprovado
+   - `/webhook/pagbank` recebe a confirmação
+   - `/webhook/pagbank-assinaturas` recebe a criação da assinatura
+   - a tela de sucesso aparece corretamente após o redirecionamento
+3. Se possível, acompanhe se a cobrança do mês seguinte ocorre automaticamente
+   (ou simule via painel de assinaturas, se o PagBank oferecer o mesmo
+   recurso em produção)
+
+### Passo 10 (opcional) — Domínio próprio e monitoramento
+
+1. No painel do Render, em **Settings → Custom Domains**, adicione seu
+   domínio (ex: `checkout.suaempresa.com.br`) e configure o DNS conforme
+   instruído — o Render emite o certificado HTTPS automaticamente
+2. Se usar domínio próprio, atualize novamente `MEU_DOMINIO`,
+   `URL_RETORNO_CLIENTE` e `URL_BACKEND` para refletir o novo endereço
+3. Configure alguma forma de monitoramento (o próprio painel de logs do
+   Render, ou uma ferramenta externa) para acompanhar falhas de pagamento e
+   quedas do serviço
 
 ---
 
-## ✅ Checklist antes de ir para produção
+## ✅ Checklist final de produção
 
 - [ ] Conta PagBank homologada para Pagamentos Recorrentes
-- [ ] `PAGBANK_TOKEN` de produção configurado
+- [ ] Token de produção gerado e configurado em `PAGBANK_TOKEN`
 - [ ] `PAGBANK_AMBIENTE=production`
+- [ ] Nenhum token real commitado no repositório
 - [ ] `MEU_DOMINIO`, `URL_RETORNO_CLIENTE` e `URL_BACKEND` apontando para URLs reais (não mais ngrok)
-- [ ] Validação de assinatura dos webhooks revisada/reativada, se desejar mais segurança
-- [ ] Teste completo de um ciclo de cobrança recorrente
+- [ ] Log confirma o registro do webhook de assinaturas na conta
+- [ ] Validação de assinatura dos webhooks revisada (e reativada, se desejado)
+- [ ] Compra de teste real aprovada, com os dois webhooks recebidos
+- [ ] Ciclo de cobrança recorrente confirmado
+- [ ] (Opcional) Domínio próprio configurado com HTTPS
+- [ ] (Opcional) Monitoramento de logs/erros configurado
 
 ---
 
